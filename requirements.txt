@@ -1,0 +1,33 @@
+# ── Core scientific stack ─────────────────────────────────────────
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+
+# ── Geospatial ────────────────────────────────────────────────────
+geopandas>=0.14
+rasterio>=1.3
+shapely>=2.0.6           # pin to wheel-only versions (no source build)
+pyproj>=3.6
+fiona>=1.9
+h5py>=3.10
+
+# ── Remote sensing / raster ───────────────────────────────────────
+# richdem has no Windows binary wheel — replaced by numpy-based slope/aspect
+# (see src/features/indices.py compute_terrain_features)
+earthengine-api>=0.1.390
+
+# ── Machine learning ──────────────────────────────────────────────
+scikit-learn>=1.4
+xgboost>=2.0
+joblib>=1.3
+
+# ── Visualisation ─────────────────────────────────────────────────
+matplotlib>=3.8
+seaborn>=0.13
+contextily>=1.4
+folium>=0.15
+
+# ── Utilities ─────────────────────────────────────────────────────
+pyyaml>=6.0
+tqdm>=4.66
+requests>=2.31

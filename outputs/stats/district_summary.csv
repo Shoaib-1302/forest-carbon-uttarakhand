@@ -1,0 +1,2 @@
+District,State,Forest Area (km2),Forest Area (ha),Mean Biomass (t/ha),Median Biomass (t/ha),Mean Carbon Stock (tC/ha),Total Carbon Stock (MtC),Total CO2e Stored (MtCO2e),Model,R2_log,MAE_tpha
+Nainital,Uttarakhand,7458.6,745861.0,105.4,100.5,49.5,36.95,135.62,XGBRegressor,0.649,56.3
