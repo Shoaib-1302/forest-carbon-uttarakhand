@@ -22,3 +22,6 @@ Thumbs.db
 
 # Credentials
 .netrc
+
+outputs/
+*.tif
