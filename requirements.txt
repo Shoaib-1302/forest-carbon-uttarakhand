@@ -3,13 +3,10 @@ numpy
 pandas
 scipy
 
-# ── Geospatial ────────────────────────────────────────────────────
-geopandas
+# ── Geospatial (rasterio bundles its own GDAL — no system dep needed) ──
 rasterio
 shapely
 pyproj
-fiona
-h5py
 
 # ── Remote sensing ────────────────────────────────────────────────
 earthengine-api
@@ -26,20 +23,15 @@ shap
 # ── Visualisation ─────────────────────────────────────────────────
 matplotlib
 seaborn
-contextily
 folium
 plotly
 
 # ── Dashboard ─────────────────────────────────────────────────────
 streamlit
 
-# ── Notebooks ─────────────────────────────────────────────────────
-jupyter
-ipykernel
-ipywidgets
-
 # ── Utilities ─────────────────────────────────────────────────────
 pyyaml
 tqdm
 requests
 statsmodels
+h5py
