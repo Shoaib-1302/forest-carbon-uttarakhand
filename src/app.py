@@ -27,7 +27,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+# ROOT always points to the repo root regardless of where app.py lives
+_here = Path(__file__).resolve().parent
+ROOT = _here.parent if (_here / "config").exists() is False and (_here.parent / "config").exists() else _here
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
