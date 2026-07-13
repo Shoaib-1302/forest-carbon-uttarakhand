@@ -544,7 +544,6 @@ consistent with waveform distortion on slopes >25° *(Duncanson et al. 2022)*.
     """)
     st.code(
         'Khan, S. (2025). Forest Carbon Stock Estimation in the Himalayan Ecosystem '
-        'of Uttarakhand Using Sentinel-2 and GEDI LiDAR Data. '
-        'MSc Data Science, CHRIST University, Bengaluru.',
+        'of Uttarakhand Using Sentinel-2 and GEDI LiDAR Data. ',
         language="text"
     )
