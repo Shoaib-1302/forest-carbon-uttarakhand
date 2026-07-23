@@ -303,7 +303,7 @@ with tab1:
 
     four = fig_dir / "map_four_panel.png"
     if four.exists():
-        st.image(str(four), use_container_width=True,
+        st.image(str(four), width="stretch",
                  caption="Four-panel carbon output — Nainital District, Uttarakhand")
     else:
         st.info("Map figures not found. Push `outputs/figures/` to GitHub.")
@@ -313,24 +313,24 @@ with tab1:
         p = fig_dir / "map_biomass.png"
         if p.exists():
             st.markdown("#### Biomass (t/ha)")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
     with col_b:
         p = fig_dir / "map_carbon_stock.png"
         if p.exists():
             st.markdown("#### Carbon Stock (tC/ha)")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
 
     col_c, col_d = st.columns(2)
     with col_c:
         p = fig_dir / "map_co2e.png"
         if p.exists():
             st.markdown("#### CO₂e Stored (tCO₂e/ha)")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
     with col_d:
         p = fig_dir / "map_seq_potential.png"
         if p.exists():
             st.markdown("#### Sequestration Potential")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
 
     st.markdown("---")
     st.markdown("#### Key Numbers")
@@ -354,7 +354,7 @@ with tab2:
         for c in ["MAE","RMSE","R2","R2_log"]:
             if c in disp.columns:
                 disp[c] = disp[c].round(3)
-        st.dataframe(disp, use_container_width=True, hide_index=True)
+        st.dataframe(disp, width="stretch", hide_index=True)
 
         best_r2 = float(metrics["R2_log"].max()) if "R2_log" in metrics.columns \
                   else float(metrics["R2"].max())
@@ -379,7 +379,7 @@ with tab2:
         fig_elev.update_traces(texttemplate="n=%{text:,}", textposition="outside")
         fig_elev.update_layout(height=350, margin=dict(t=20,b=10),
                                showlegend=False, coloraxis_showscale=False)
-        st.plotly_chart(fig_elev, use_container_width=True)
+        st.plotly_chart(fig_elev, width="stretch")
 
     st.markdown("---")
     fig_dir = ROOT / PATHS["output_figs"]
@@ -388,24 +388,24 @@ with tab2:
         p = fig_dir / "scatter_actual_vs_predicted.png"
         if p.exists():
             st.markdown("#### Actual vs Predicted")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
     with cd:
         p = fig_dir / "residual_distribution.png"
         if p.exists():
             st.markdown("#### Residual Distribution")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
 
     ce, cf = st.columns(2)
     with ce:
         p = fig_dir / "feature_importance_xgboost.png"
         if p.exists():
             st.markdown("#### XGBoost Feature Importance")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
     with cf:
         p = fig_dir / "feature_importance_random_forest.png"
         if p.exists():
             st.markdown("#### Random Forest Feature Importance")
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), width="stretch")
 
     st.info("""
     **Key Finding:** R²(log)=0.65 overall, but R²=0.63 below 700m vs R²=0.30 above 1200m.
@@ -439,7 +439,7 @@ with tab3:
         fig.add_vline(x=train_df["agbd"].mean(), line_dash="dash", line_color="red",
                       annotation_text=f"Mean={train_df['agbd'].mean():.1f}")
         fig.update_layout(height=350, margin=dict(t=40,b=10))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     with g2:
         samp = train_df.sample(min(3000, len(train_df)), random_state=42)
@@ -449,7 +449,7 @@ with tab3:
                          template="plotly_white", title="AGBD vs NDVI")
         fig.update_traces(marker=dict(size=4))
         fig.update_layout(height=350, margin=dict(t=40,b=10))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     bins   = [0,700,1200,1700,2200,9999]
     labels_eb = ["<700m","700-1200m","1200-1700m","1700-2200m",">2200m"]
@@ -463,20 +463,20 @@ with tab3:
                  title="Mean AGBD by Elevation Band")
     fig.update_traces(texttemplate="n=%{text:,}", textposition="outside")
     fig.update_layout(height=360, margin=dict(t=40,b=10), showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown("#### Spatial Distribution")
     msamp = train_df.sample(min(5000, len(train_df)), random_state=1)
-    fig = px.scatter_mapbox(
+    fig = px.scatter_map(
         msamp, lat="latitude", lon="longitude",
         color="agbd", color_continuous_scale="YlGn",
-        zoom=9, mapbox_style="carto-positron",
+        zoom=9, center={"lat": 29.35, "lon": 79.45}, zoom=9,
         labels={"agbd":"AGBD (t/ha)"},
         hover_data={"agbd":":.1f","NDVI":":.3f","elevation":":.0f"},
     )
     fig.update_traces(marker=dict(size=4, opacity=0.6))
     fig.update_layout(height=480, margin=dict(t=0,b=0))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -547,7 +547,7 @@ with tab4:
         number={"suffix":" t/ha","valueformat":".1f"},
     ))
     fig_g.update_layout(height=300, margin=dict(t=30,b=10))
-    st.plotly_chart(fig_g, use_container_width=True)
+    st.plotly_chart(fig_g, width="stretch")
 
     # Show what drives the prediction
     with st.expander("What's driving this prediction?"):
@@ -565,7 +565,7 @@ with tab4:
                 f"{'GEDI uncertainty increases' if slope>25 else 'reliable prediction'}",
             ]
         })
-        st.dataframe(drivers, use_container_width=True, hide_index=True)
+        st.dataframe(drivers, width="stretch", hide_index=True)
 
 
 # ══════════════════════════════════════════════════════════════════
