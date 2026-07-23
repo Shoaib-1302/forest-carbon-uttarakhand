@@ -470,7 +470,7 @@ with tab3:
     fig = px.scatter_map(
         msamp, lat="latitude", lon="longitude",
         color="agbd", color_continuous_scale="YlGn",
-        zoom=9, center={"lat": 29.35, "lon": 79.45}, zoom=9,
+        zoom=9, center={"lat": 29.35, "lon": 79.45},
         labels={"agbd":"AGBD (t/ha)"},
         hover_data={"agbd":":.1f","NDVI":":.3f","elevation":":.0f"},
     )
