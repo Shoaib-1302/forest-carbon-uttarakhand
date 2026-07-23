@@ -1,35 +1,19 @@
-# ── Core scientific stack ─────────────────────────────────────────
 numpy
 pandas
 scipy
-
-# ── Geospatial (rasterio bundles its own GDAL — no system dep needed) ──
 rasterio
 shapely
 pyproj
-
-# ── Remote sensing ────────────────────────────────────────────────
 earthengine-api
 earthaccess
-
-# ── Machine learning ──────────────────────────────────────────────
 scikit-learn
 xgboost
 joblib
-
-# ── Explainability ────────────────────────────────────────────────
-shap
-
-# ── Visualisation ─────────────────────────────────────────────────
 matplotlib
 seaborn
 folium
 plotly
-
-# ── Dashboard ─────────────────────────────────────────────────────
 streamlit
-
-# ── Utilities ─────────────────────────────────────────────────────
 pyyaml
 tqdm
 requests
