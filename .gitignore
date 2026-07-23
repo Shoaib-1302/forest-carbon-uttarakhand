@@ -1,14 +1,17 @@
-# Data (large files)
+# ── Large data files (not pushed) ────────────────────────────────
 data/raw/
 data/gedi/
 data/sentinel/
 data/dem/
 data/processed/
 
-# Model artifacts
+# ── Large model artifacts (not pushed) ───────────────────────────
 outputs/models/
 
-# Python
+# ── Large rasters (not pushed) ───────────────────────────────────
+outputs/maps/
+
+# ── Python ───────────────────────────────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
@@ -16,12 +19,20 @@ __pycache__/
 *.egg-info/
 .ipynb_checkpoints/
 
-# OS
+# ── OS ───────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Credentials
+# ── Credentials ──────────────────────────────────────────────────
 .netrc
 
-outputs/
-*.tif
+# ── WHAT IS TRACKED (not ignored) ────────────────────────────────
+# outputs/figures/*.png     ← all map and chart PNGs
+# outputs/stats/*.csv       ← district_summary.csv, model_metrics.csv
+# src/app.py                ← Streamlit dashboard
+# src/**/*.py               ← all pipeline code
+# config/config.yaml
+# requirements.txt
+# packages.txt
+# README.md
+# notebooks/*.ipynb
