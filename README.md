@@ -1,106 +1,129 @@
-# Forest Carbon Stock Estimation — Nainital District, Uttarakhand
+# Forest Carbon Stock Estimation
 
-**Sentinel-2 · GEDI LiDAR · SRTM DEM · Random Forest · XGBoost**
+An end-to-end biomass and carbon mapping workflow for Nainital District,
+Uttarakhand. The project combines Sentinel-2 surface reflectance, GEDI L4A
+above-ground biomass density (AGBD), and SRTM terrain data to estimate biomass,
+carbon stock, CO2-equivalent storage, and sequestration-potential zones.
 
-Estimates above-ground biomass density (AGBD) across forested pixels using
-GEDI L4A footprints as ground truth, Sentinel-2 spectral indices and SRTM
-terrain features as predictors, and converts predictions to carbon stock
-(tC/ha) and CO₂ equivalent (tCO₂e/ha) using IPCC (2006) factors.
+The repository includes a Streamlit dashboard for exploring the generated maps,
+model results, GEDI samples, live predictions, and methodology.
 
----
+## Study Area and Method
 
-## Repository Structure
+- **Area:** Nainital District, Uttarakhand
+- **Approximate extent:** 79.0-79.9 E, 29.0-29.7 N
+- **Coordinate system:** WGS 84 for source data; UTM Zone 44N for area calculations
+- **Sentinel-2 period:** November 2024 to March 2025
+- **Sentinel-2 bands:** B2, B3, B4, B8, B11, and B12
+- **Derived indices:** NDVI, EVI, NDMI, NBR, and SAVI
+- **Terrain features:** elevation, slope, and aspect from SRTM DEM
+- **Target:** GEDI L4A `agbd`
+- **Model inputs:** 26 engineered features, including spectral, terrain, spatial,
+	squared, interaction, and aspect features
 
-```
-forest_carbon/
-├── config/
-│   └── config.yaml              # All paths, constants, GEE params
-├── data/
-│   ├── raw/                     # Original downloads (git-ignored)
-│   ├── sentinel/                # GEE-exported Sentinel-2 GeoTIFFs
-│   ├── gedi/                    # GEDI L4A .h5 files
-│   ├── dem/                     # SRTM DEM + slope + aspect GeoTIFFs
-│   └── processed/               # Merged training CSV + prediction grid
-├── src/
-│   ├── data/
-│   │   ├── gee_export.js        # GEE script — Sentinel-2 + DEM export
-│   │   ├── download_gedi.py     # GEDI L4A download via NASA EarthData
-│   │   └── build_dataset.py     # Merge GEDI footprints + raster features
-│   ├── features/
-│   │   └── indices.py           # Spectral indices + terrain derivation
-│   ├── models/
-│   │   ├── train.py             # Train RF + XGBoost, save artifacts
-│   │   └── predict.py           # Wall-to-wall biomass prediction
-│   ├── visualization/
-│   │   └── maps.py              # Biomass / carbon / CO₂e map plots
-│   └── utils/
-│       └── raster_utils.py      # Common raster I/O helpers
-├── notebooks/
-│   ├── 01_eda.ipynb             # Exploratory data analysis
-│   ├── 02_feature_engineering.ipynb
-│   ├── 03_model_training.ipynb
-│   └── 04_carbon_mapping.ipynb
-├── outputs/
-│   ├── maps/                    # Output GeoTIFFs
-│   ├── stats/                   # District summary CSVs
-│   └── figures/                 # PNG plots
-├── requirements.txt
-└── README.md
+Biomass is converted using the configured IPCC factors:
+
+```text
+Carbon stock (tC/ha) = Biomass (t/ha) * 0.47
+CO2e (tCO2e/ha)      = Carbon stock (tC/ha) * 3.67
 ```
 
----
+## Generated Results
+
+The values below come from `outputs/stats/district_summary.csv`.
+
+| Measure | Result |
+|---|---:|
+| Forest area | 4,596.8 km2 |
+| Forest area | 459,680 ha |
+| Mean biomass | 119.1 t/ha |
+| Median biomass | 116.1 t/ha |
+| Mean carbon stock | 56.0 tC/ha |
+| Total carbon stock | 25.73 MtC |
+| Total CO2e stored | 94.42 MtCO2e |
+| Recorded model | StackingRegressor |
+| Recorded log-scale R2 | 0.649 |
+| Recorded MAE | 56.3 t/ha |
+
+The model comparison table in `outputs/stats/model_metrics.csv` records the
+following held-out evaluation results:
+
+| Model | MAE | RMSE | R2 | R2 log |
+|---|---:|---:|---:|---:|
+| Random Forest | 62.56 | 81.93 | 0.346 | 0.477 |
+| XGBoost | 61.84 | 80.76 | 0.364 | 0.476 |
+| Stacking Ensemble | 61.69 | 80.61 | 0.366 | 0.482 |
+
+These are observed project results, not performance targets.
+
+## Repository Layout
+
+```text
+config/config.yaml                 Central paths, factors, thresholds, and parameters
+data/gedi/                         GEDI L4A source files
+data/processed/                    Training dataset and prediction grid
+data/sentinel/                     Sentinel-2 raster inputs
+notebooks/                         EDA, feature engineering, training, and mapping notebooks
+outputs/models/                    Trained joblib models and feature list
+outputs/maps/                      Biomass, carbon, CO2e, and sequestration rasters
+outputs/stats/                     District summary and model metrics CSVs
+outputs/figures/                   Static map figures
+src/app.py                         Streamlit dashboard
+src/data/                          Data download and dataset construction code
+src/features/                      Spectral and terrain feature engineering
+src/models/                        Model training and wall-to-wall prediction
+src/utils/                         Raster and project utilities
+src/visualization/                 Output map generation
+```
 
 ## Quick Start
 
+Create or activate a Python environment, then install the dependencies:
+
 ```bash
-# 1. Install dependencies
 pip install -r requirements.txt
+```
 
-# 2. Run GEE export (paste gee_export.js into code.earthengine.google.com)
+Run the dashboard from the repository root:
 
-# 3. Download GEDI
+```bash
+streamlit run src/app.py
+```
+
+To reproduce the processing workflow, run the stages in order:
+
+```bash
 python src/data/download_gedi.py
-
-# 4. Build training dataset
 python src/data/build_dataset.py
-
-# 5. Train models
 python src/models/train.py
-
-# 6. Predict + generate maps
 python src/models/predict.py
-
-# 7. Plot outputs
 python src/visualization/maps.py
 ```
 
----
+The GEDI download stage requires NASA Earthdata access. The Sentinel-2 and DEM
+inputs are configured for Google Earth Engine exports in `config/config.yaml`.
 
-## Outputs
+## Output Files
 
 | File | Description |
-|------|-------------|
-| `outputs/maps/biomass.tif` | Predicted AGBD (t/ha) |
-| `outputs/maps/carbon_stock.tif` | Carbon stock (tC/ha) |
-| `outputs/maps/co2e.tif` | CO₂ equivalent (tCO₂e/ha) |
-| `outputs/maps/seq_potential.tif` | Sequestration potential zones (1–4) |
-| `outputs/stats/district_summary.csv` | Total area, mean biomass, total carbon |
+|---|---|
+| `outputs/maps/biomass.tif` | Predicted biomass density in t/ha |
+| `outputs/maps/carbon_stock.tif` | Carbon stock in tC/ha |
+| `outputs/maps/co2e.tif` | Stored CO2 equivalent in tCO2e/ha |
+| `outputs/maps/seq_potential.tif` | Sequestration-potential zones from 1 to 4 |
+| `outputs/stats/district_summary.csv` | District-level area and carbon summary |
+| `outputs/stats/model_metrics.csv` | Validation metrics for each model |
+| `outputs/models/best_model.joblib` | Selected production model |
+| `outputs/models/feature_list.txt` | Feature order used during prediction |
 
----
+Sequestration zones are configured as Low, Medium, High, and Very High. They
+are assigned using biomass, NDVI, slope, and elevation thresholds in
+`config/config.yaml`.
 
-## IPCC Conversion Factors
+## Notes
 
-```
-Carbon Stock (tC/ha)   = AGBD (t/ha) × 0.47
-CO₂e       (tCO₂e/ha) = Carbon Stock × 3.67
-```
-
----
-
-## Target Performance
-
-| Metric | Target |
-|--------|--------|
-| R²     | ≥ 0.70 |
-| MAE    | < 30 t/ha |
-| RMSE   | < 45 t/ha |
+- `src/models/predict.py` processes the prediction grid in chunks to limit memory use.
+- The dashboard can fall back to embedded demo data when large rasters, CSVs, or
+	model files are unavailable.
+- Generated rasters and statistics should be treated as estimates for the
+	configured study area and input period.
