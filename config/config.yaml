@@ -1,0 +1,163 @@
+# ─────────────────────────────────────────────────────────────────
+# Forest Carbon Project — Central Configuration
+# ─────────────────────────────────────────────────────────────────
+
+# ── Study Area ────────────────────────────────────────────────────
+study_area:
+  name: "Nainital District, Uttarakhand"
+  district: "Nainital"
+  state: "Uttarakhand"
+  # Approximate bounding box (WGS-84)
+  bbox:
+    xmin: 79.0
+    ymin: 29.0
+    xmax: 79.9
+    ymax: 29.7
+
+# ── Coordinate Reference System ───────────────────────────────────
+crs: "EPSG:4326"
+crs_projected: "EPSG:32644"   # UTM Zone 44N — used for area calculations
+
+# ── Paths ─────────────────────────────────────────────────────────
+paths:
+  sentinel_dir:   "data/sentinel"
+  gedi_dir:       "data/gedi"
+  dem_dir:        "data/dem"
+  processed_dir:  "data/processed"
+  output_maps:    "outputs/maps"
+  output_stats:   "outputs/stats"
+  output_figs:    "outputs/figures"
+  model_dir:      "outputs/models"
+
+  # Key files
+  training_csv:   "data/processed/training_dataset.csv"
+  prediction_grid: "data/processed/prediction_grid.csv"
+  sentinel_stack: "data/sentinel/sentinel2_stack.tif"
+  dem_tif:        "data/dem/srtm_nainital.tif"
+  slope_tif:      "data/dem/slope.tif"
+  aspect_tif:     "data/dem/aspect.tif"
+  biomass_tif:    "outputs/maps/biomass.tif"
+  carbon_tif:     "outputs/maps/carbon_stock.tif"
+  co2e_tif:       "outputs/maps/co2e.tif"
+  seq_tif:        "outputs/maps/seq_potential.tif"
+
+# ── Sentinel-2 ────────────────────────────────────────────────────
+sentinel:
+  collection: "COPERNICUS/S2_SR_HARMONIZED"
+  start_date: "2024-11-01"    # Dry season composite for fewer clouds
+  end_date:   "2025-03-31"
+  cloud_cover_max: 20         # % — pre-filter before cloud masking
+  bands:
+    - B2    # Blue
+    - B3    # Green
+    - B4    # Red
+    - B8    # NIR
+    - B11   # SWIR1
+    - B12   # SWIR2
+  scale: 20                   # metres — native S2 10m resampled to 20m
+  gee_asset_prefix: "projects/ee-YOUR_PROJECT/assets/nainital"
+
+# ── GEDI ──────────────────────────────────────────────────────────
+gedi:
+  product: "GEDI02_B"         # L2B used for canopy cover
+  l4a_product: "GEDI04_A"     # L4A used for AGBD (target variable)
+  target_variable: "agbd"
+  quality_flag: 1             # l4_quality_flag == 1 → high confidence
+  min_agbd: 0                 # t/ha — remove negative/spurious values
+  max_agbd: 600               # t/ha — remove obvious outliers
+
+# ── DEM ───────────────────────────────────────────────────────────
+dem:
+  source: "USGS/SRTMGL1_003"
+  scale: 30                   # metres
+
+# ── Features ──────────────────────────────────────────────────────
+features:
+  spectral_indices:
+    - NDVI
+    - EVI
+    - NDMI
+    - NBR
+    - SAVI
+  raw_bands:
+    - B8
+    - B11
+    - B12
+  terrain:
+    - elevation
+    - slope
+    - aspect
+  spatial:
+    - latitude
+    - longitude
+
+  # Full feature list fed to the model (order matters for predict.py)
+  model_features:
+    - NDVI
+    - EVI
+    - NDMI
+    - NBR
+    - SAVI
+    - B8
+    - B11
+    - B12
+    - elevation
+    - slope
+    - aspect
+    - latitude
+    - longitude
+
+# ── IPCC Carbon Conversion ────────────────────────────────────────
+ipcc:
+  biomass_to_carbon: 0.47     # IPCC 2006 Tier 1 factor
+  carbon_to_co2e:   3.67      # Molecular weight ratio CO2/C
+
+# ── Machine Learning ──────────────────────────────────────────────
+ml:
+  target: "agbd"
+  test_size: 0.2
+  random_state: 42
+  cv_folds: 5
+
+  random_forest:
+    n_estimators: 300
+    max_depth: 20
+    min_samples_split: 5
+    min_samples_leaf: 2
+    max_features: "sqrt"
+    n_jobs: -1
+
+  xgboost:
+    n_estimators: 500
+    learning_rate: 0.05
+    max_depth: 7
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 3
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+    n_jobs: -1
+    early_stopping_rounds: 30
+
+# ── Sequestration Potential Thresholds ───────────────────────────
+seq_potential:
+  # Pixels with current biomass below these thresholds (t/ha)
+  # are candidates for sequestration potential classification
+  degraded_biomass_threshold: 50   # t/ha — below this = degraded/sparse
+  # NDVI threshold for non-forest land cover
+  non_forest_ndvi: 0.3
+  # Potential zone labels
+  zones:
+    1: "Low"
+    2: "Medium"
+    3: "High"
+    4: "Very High"
+
+# ── Visualisation ─────────────────────────────────────────────────
+viz:
+  dpi: 150
+  figsize: [14, 10]
+  biomass_cmap: "YlGn"
+  carbon_cmap:  "Greens"
+  co2e_cmap:    "BuGn"
+  seq_colors:   ["#ef9a9a", "#fff59d", "#a5d6a7", "#2e7d32"]
