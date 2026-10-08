@@ -1169,6 +1169,3 @@ The project uses publicly available Earth observation datasets including:
 
 The datasets can be accessed through Google Earth Engine subject to the
 relevant platform requirements.
-
-field observations, improved forest masking, and
-additional remote-sensing predictors.
